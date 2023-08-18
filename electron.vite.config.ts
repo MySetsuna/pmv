@@ -2,12 +2,10 @@ import { resolve } from 'path'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import react from '@vitejs/plugin-react'
 
-console.log(resolve(__dirname, '.env'), ` resolve(__dirname, '.env')`)
-
 export default defineConfig(() => {
+  //加载环境变量
+  // loadEnv(process.env.MODE ?? mode, resolve(__dirname, '.env'), '')
   return {
-    envDir: resolve(__dirname, '.env'),
-    envPrefix: 'PM_',
     main: {
       envDir: resolve(__dirname, '.env'),
       envPrefix: 'PM_',

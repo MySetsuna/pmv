@@ -1,5 +1,6 @@
 appId: com.electron.app
 productName: pmv
+beforePack: './electron-builder-before.js'
 directories:
   buildResources: build
 files:
@@ -15,7 +16,7 @@ afterSign: build/notarize.js
 win:
   executableName: pmv
 nsis:
-  artifactName: ${PM_APP_NAME}-${version}-setup.${ext}
+  artifactName: ${env.PM_APP_NAME}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
@@ -27,7 +28,7 @@ mac:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
 dmg:
-  artifactName: ${PM_APP_NAME}-${version}.${ext}
+  artifactName: ${env.PM_APP_NAME}-${version}.${ext}
 linux:
   target:
     - AppImage
@@ -36,7 +37,7 @@ linux:
   maintainer: electronjs.org
   category: Utility
 appImage:
-  artifactName: ${PM_APP_NAME}-${version}.${ext}
+  artifactName: ${env.PM_APP_NAME}-${version}.${ext}
 npmRebuild: false
 publish:
   provider: generic
