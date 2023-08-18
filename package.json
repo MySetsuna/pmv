@@ -21,9 +21,9 @@
     "build:L1": "npm run typecheck && electron-vite build -m L1",
     "build:test": "npm run typecheck && electron-vite build -m test",
     "build:prod": "npm run typecheck && electron-vite build -m prod",
-    "package:L1": "npm run build:L1 &&cross-env MODE=L1 electron-builder --config",
-    "package:test": "npm run build:test && cross-env MODE=test electron-builder --config",
-    "package:prod": "npm run build:prod && cross-env MODE=prod electron-builder --config"
+    "package:L1": "npm run build:L1 &&cross-env MODE=L1 electron-builder --config electron-builder-config.js",
+    "package:test": "npm run build:test && cross-env MODE=test electron-builder --config electron-builder-config.js",
+    "package:prod": "npm run build:prod && cross-env MODE=prod electron-builder --config electron-builder-config.js"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^2.0.0",

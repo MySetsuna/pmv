@@ -1,18 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 const { config } = require('dotenv')
-const { BeforeBuildContext } = require('electron-builder')
 const path = require('path')
 /**
  *
- * @param {BeforeBuildContext} _context
+ * @param {BeforePackContext} context
  */
-const loadEnv = (_context) => {
-  const mode = process.env.MODE
-  const defaultPath = path.join(__dirname, './.env', `.env`)
-  const modePath = path.join(__dirname, './.env', `.env.${mode}`)
-  const localPath = path.join(__dirname, './.env', `.env.local`)
+const beforePack = (context) => {
+  // todo
+}
+
+const loadEnv = (mode) => {
+  const defaultPath = path.join('./.env', `.env`)
+  const modePath = path.join('./.env', `.env.${mode}`)
+  const localPath = path.join('./.env', `.env.local`)
   const load = (envPath) => {
+    console.log(envPath, 'envPath')
     try {
       config({ path: envPath, override: true })
     } catch (err) {
@@ -23,5 +26,4 @@ const loadEnv = (_context) => {
   load(modePath)
   load(localPath)
 }
-
-exports.default = loadEnv
+module.exports = { beforePack, loadEnv }

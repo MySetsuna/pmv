@@ -1,6 +1,7 @@
 appId: com.electron.app
-productName: pmv
 beforePack: './electron-builder-before.js'
+# 这里的产品名没法用环境变量,所以只好弃用yml文件,用js
+productName: pmv
 directories:
   buildResources: build
 files:
@@ -17,8 +18,8 @@ win:
   executableName: pmv
 nsis:
   artifactName: ${env.PM_APP_NAME}-${version}-setup.${ext}
-  shortcutName: ${productName}
-  uninstallDisplayName: ${productName}
+  shortcutName: ${env.PM_APP_NAME}
+  uninstallDisplayName: ${env.PM_APP_NAME}
   createDesktopShortcut: always
 mac:
   entitlementsInherit: build/entitlements.mac.plist
