@@ -1,36 +1,50 @@
-import { createHashRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom'
+import {
+  createHashRouter,
+  createRoutesFromElements,
+  NavLink,
+  Route,
+  RouterProvider,
+  useRouteError
+} from 'react-router-dom'
 import Home from './components/Home/Home'
 import { useAuth } from './providers'
-import { useQueryClient } from 'react-query'
-import { memo } from 'react'
+import Dashboard from './components/Dashboard'
 
-const Test = memo(() => {
-  console.log('tettestst')
-  return <>tttt</>
-})
-Test.displayName = 'Test'
+const ErrorBoundary = () => {
+  const error = useRouteError() as Error
+  return <>{error.message}</>
+}
 
 const App = () => {
   console.log('进入程序')
 
-  const queryClient = useQueryClient()
-  const { userInfo } = useAuth()
+  // 在这里使用context里的数据
+  const { userInfo, isLoading } = useAuth()
   const router = createHashRouter(
     createRoutesFromElements(
-      <Route path="/" element={<Home />}>
+      <Route
+        path="/"
+        element={<Home />}
+        errorElement={
+          <>
+            没有权限<NavLink to="/">返回首页</NavLink>
+          </>
+        }
+      >
         <Route
-          path="dashboard"
-          element={<>test</>}
+          path="/dashboard/:id"
+          element={<Dashboard />}
           // 注意!: 不要在Route 的 loader 和 action 中使用上下文相关hooks : useContext以及依赖他实现的hook
-          loader={async ({ params }) => {
-            console.log(userInfo, params, 'params')
-            if (userInfo.name === 'Jack') {
-              throw new Error('无权限')
+          loader={({ params }) => {
+            if (
+              userInfo.dashboard instanceof Array &&
+              userInfo.dashboard.includes(Number(params.id))
+            ) {
+              return Promise.resolve(userInfo)
             }
-            console.log(params, queryClient)
-            return Promise.resolve(true)
+            throw new Error('无权限')
           }}
-          errorElement={<>没有权限</>}
+          errorElement={isLoading ? <>Loading...</> : <ErrorBoundary />}
         />
         {/* ... etc. */}
       </Route>
@@ -38,9 +52,7 @@ const App = () => {
   )
   return (
     <>
-      app
       <RouterProvider router={router} />
-      <Test />
     </>
   )
 }
