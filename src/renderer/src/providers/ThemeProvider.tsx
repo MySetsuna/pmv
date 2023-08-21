@@ -14,7 +14,7 @@ const ThemeContext = createContext<ThemeContextValue>(undefined)
 
 const ThemeProvider = (props: Props) => {
   const { userInfo } = useAuth()
-  const { data: themeData = { background: '' } } = useQuery(
+  const { data: themeData = { background: 'rgb(47, 50, 65,0.8)' } } = useQuery(
     [THEME_INFO, userInfo.name],
     () => getThemeByUserId(userInfo.name ?? ''),
     {

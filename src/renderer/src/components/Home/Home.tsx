@@ -1,10 +1,14 @@
 import { useAuth } from '@renderer/providers'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { memo, useCallback, useEffect, useState } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { useCallback, useEffect, useState } from 'react'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import './Home.less'
 import { type UserInfo } from '@renderer/types'
 import { USER_INFO } from '@renderer/constant/api'
+import { observer } from 'mobx-react'
+import { useCounter } from '@renderer/providers/CounterProvider'
+import { Button, Card, Col, Input, Row, Space } from 'antd'
+import { useTheme } from '@renderer/providers/ThemeProvider'
 
 const postUserInfo = async () => {
   return await new Promise<boolean>((resolve) => {
@@ -16,10 +20,21 @@ const postUserInfo = async () => {
 
 const Home = () => {
   const { changeUser, userInfo } = useAuth()
+
+  const [counterNumber, setCounterNumber] = useState<number | string>('')
+  const [counterXNumber, setCounterXNumber] = useState<number | string>('')
   const [toChangUserName, setToChangUserName] = useState(userInfo.name ?? '')
   const [toChangeUserDashboard, setToChangeDashboard] = useState(
     userInfo.dashboard?.join(',') ?? ''
   )
+
+  const { background } = useTheme()
+
+  const navigate = useNavigate()
+
+  // 不要解构使用action 等方法
+  const counterStore = useCounter()
+
   const queryClient = useQueryClient()
   // 修改
   const mutation = useMutation<boolean, Error, UserInfo>({
@@ -45,78 +60,141 @@ const Home = () => {
     setToChangeDashboard(userInfo.dashboard?.join(',') ?? '')
   }, [userInfo])
 
+  useEffect(() => {
+    setCounterXNumber(counterStore.value)
+  }, [counterStore.value])
+
   const navLinkClass = useCallback(
     ({ isActive, isPending }) => (isPending ? 'pending' : isActive ? 'active' : ''),
     []
   )
-
   return (
     <div>
       首页 用户:{userInfo?.name}
-      <div>
-        <NavLink className={navLinkClass} to="/dashboard/1">
-          dashboard1
-        </NavLink>
-        <br />
-        <NavLink className={navLinkClass} to="/dashboard/2">
-          dashboard2
-        </NavLink>
-        <br />
-        <NavLink className={navLinkClass} to="/">
-          返回
-        </NavLink>
-      </div>
-      <div>
-        变更用户 :
-        <input
-          placeholder="用户Id..."
-          value={toChangUserName}
-          onChange={(e) => setToChangUserName(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.code === 'Enter' && toChangUserName) {
-              changeUser(toChangUserName)
-            }
-          }}
-        />
-        <button onClick={() => changeUser(toChangUserName)}>确认</button>
-      </div>
-      <div>
-        变更权限 :
-        <input
-          placeholder="权限Id,用','隔开"
-          value={toChangeUserDashboard}
-          onChange={(e) => setToChangeDashboard(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.code === 'Enter') {
-              mutation.mutate({
-                dashboard:
-                  toChangeUserDashboard
-                    .split(',')
-                    .filter((item) => item)
-                    .map(Number) ?? []
-              })
-            }
-          }}
-        />
-        <button
-          onClick={() =>
-            mutation.mutate({
-              dashboard:
-                toChangeUserDashboard
-                  .split(',')
-                  .filter((item) => item)
-                  .map(Number) ?? []
-            })
-          }
-        >
-          确认
-        </button>
-      </div>
-      <div>
+      <Card bodyStyle={{ background, color: 'white' }}>
+        <Row gutter={18}>
+          <Col span={7}>
+            <Space wrap>
+              <Button>
+                <NavLink className={navLinkClass} to="/dashboard/1">
+                  dashboard1
+                </NavLink>
+              </Button>
+              <br />
+              <Button>
+                <NavLink className={navLinkClass} to="/dashboard/2">
+                  dashboard2
+                </NavLink>
+              </Button>
+              <br />
+              <Button>
+                <NavLink className={navLinkClass} to="/">
+                  返回
+                </NavLink>
+              </Button>
+            </Space>
+          </Col>
+          <Col span={7}>
+            <Space wrap>
+              <div>
+                变更用户 :
+                <Input
+                  placeholder="用户Id..."
+                  value={toChangUserName}
+                  onChange={(e) => setToChangUserName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.code === 'Enter' && toChangUserName) {
+                      changeUser(toChangUserName)
+                    }
+                  }}
+                />
+                <Button onClick={() => changeUser(toChangUserName)}>确认</Button>
+              </div>
+              <div>
+                变更权限 :
+                <Input
+                  placeholder="权限Id,用','隔开"
+                  value={toChangeUserDashboard}
+                  onChange={(e) => setToChangeDashboard(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.code === 'Enter') {
+                      mutation.mutate({
+                        dashboard:
+                          toChangeUserDashboard
+                            .split(',')
+                            .filter((item) => item)
+                            .map(Number) ?? []
+                      })
+                    }
+                  }}
+                />
+                <Button
+                  onClick={() =>
+                    mutation.mutate({
+                      dashboard:
+                        toChangeUserDashboard
+                          .split(',')
+                          .filter((item) => item)
+                          .map(Number) ?? []
+                    })
+                  }
+                >
+                  确认
+                </Button>
+              </div>
+            </Space>
+          </Col>
+          <Col span={7}>
+            <Space wrap>
+              <div>
+                <span>跳转CounterPage(组件内mobx) : </span>
+                <Input
+                  type="number"
+                  value={counterNumber}
+                  onChange={(e) => {
+                    setCounterNumber(e.target.value ? Number(e.target.value) : '')
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.code === 'Enter') {
+                      navigate(`/counter/${counterNumber}`)
+                    }
+                  }}
+                />
+                <Button>
+                  <NavLink className={navLinkClass} to={`/counter/${counterNumber}`}>
+                    跳转
+                  </NavLink>
+                </Button>
+              </div>
+              <div>
+                <span>跳转CounterXPage(领域/全局mobx) : </span>
+                <Input
+                  type="number"
+                  value={counterXNumber}
+                  onChange={(e) => {
+                    setCounterXNumber(e.target.value ? Number(e.target.value) : '')
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.code === 'Enter') {
+                      navigate(`/counterX/${counterXNumber}`)
+                    }
+                  }}
+                />
+                <Button>
+                  <NavLink className={navLinkClass} to={`/counterX/${counterXNumber}`}>
+                    跳转
+                  </NavLink>
+                </Button>
+              </div>
+            </Space>
+          </Col>
+        </Row>
+      </Card>
+      <Card bodyStyle={{ background, color: 'pink' }} style={{ marginTop: 20 }}>
         <Outlet />
-      </div>
+      </Card>
     </div>
   )
 }
 
-export default memo(Home)
+export default observer(Home)

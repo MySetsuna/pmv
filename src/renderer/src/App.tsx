@@ -11,6 +11,9 @@ import { useAuth } from './providers'
 import Dashboard from './components/Dashboard'
 import { useTheme } from './providers/ThemeProvider'
 import './App.less'
+import CounterPage from './components/CounterPage'
+import { CounterProvider } from './providers/CounterProvider'
+import CounterXPage from './components/CounterXPage'
 
 const ErrorBoundary = () => {
   const error = useRouteError() as Error
@@ -23,6 +26,7 @@ const App = () => {
   // 在这里使用context里的数据
   const { userInfo, isLoading } = useAuth()
   const { background } = useTheme()
+  // 不要结构使用mobx的action
   const router = createHashRouter(
     createRoutesFromElements(
       <Route
@@ -49,13 +53,16 @@ const App = () => {
           }}
           errorElement={isLoading ? <>Loading...</> : <ErrorBoundary />}
         />
-        {/* ... etc. */}
+        <Route path="/counter/:counterNumber?" element={<CounterPage />} />
+        <Route path="/counterX/:counterNumber?" element={<CounterXPage />} />
       </Route>
     )
   )
   return (
-    <div style={{ background, height: '100vh' }}>
-      <RouterProvider router={router} />
+    <div style={{ background, height: '100vh', padding: 16 }}>
+      <CounterProvider>
+        <RouterProvider router={router} />
+      </CounterProvider>
     </div>
   )
 }
