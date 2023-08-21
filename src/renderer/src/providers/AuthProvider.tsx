@@ -13,15 +13,18 @@ export type UserInfo = { [props: string]: unknown; name?: string; dashboard?: nu
 
 const getUserInfo = async (userId: string) => {
   console.log('fetch user Info ', userId)
-  setTimeout(() => {
-    if (userId === 'Jack') {
-      return Promise.resolve({ name: userId, dashboard: [1, 2] })
-    } else if (userId === 'John') {
-      return Promise.resolve({ name: userId, dashboard: [2] })
-    } else {
-      return Promise.resolve({ name: userId, dashboard: [] })
-    }
-  }, 500)
+
+  return await new Promise<UserInfo>((resolve) => {
+    setTimeout(() => {
+      if (userId === 'Jack') {
+        resolve({ name: userId, dashboard: [1, 2] })
+      } else if (userId === 'John') {
+        resolve({ name: userId, dashboard: [2] })
+      } else {
+        resolve({ name: userId, dashboard: [] })
+      }
+    }, 500)
+  })
 }
 
 type Props = {
@@ -49,7 +52,7 @@ const AuthProvider = (props: Props) => {
     setUserId('Jack')
   }, [])
 
-  console.log(userId, 'userId')
+  console.log(getUserInfo, 'getUserInfo')
 
   const {
     data: userInfo = {},
