@@ -4,13 +4,21 @@ import { useCallback, useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import './Home.less'
 import { type UserInfo } from '@renderer/types'
-import { USER_INFO } from '@renderer/constant/api'
+import { THEME_INFO, USER_INFO } from '@renderer/constant/api'
 import { observer } from 'mobx-react'
 import { useCounter } from '@renderer/providers/CounterProvider'
 import { Button, Card, Col, Input, Row, Space } from 'antd'
 import { useTheme } from '@renderer/providers/ThemeProvider'
 
 const postUserInfo = async () => {
+  return await new Promise<boolean>((resolve) => {
+    setTimeout(() => {
+      resolve(true)
+    }, 500)
+  })
+}
+
+const postTheme = async () => {
   return await new Promise<boolean>((resolve) => {
     setTimeout(() => {
       resolve(true)
@@ -51,6 +59,26 @@ const Home = () => {
       // 前端直接改
       queryClient.setQueryData<UserInfo>([USER_INFO, userInfo.name], (preUserInfo) =>
         Object.assign({}, preUserInfo, variables)
+      )
+    }
+  })
+
+  const themeMutation = useMutation<boolean, Error, { background: string }>({
+    mutationFn: postTheme,
+    onMutate(variables) {
+      queryClient.setQueryData<{ background: string }>([THEME_INFO, userInfo.name], (oldTheme) =>
+        Object.assign({}, oldTheme, variables)
+      )
+    },
+    onSuccess: (_data, variables) => {
+      // 错误处理和刷新
+      // 从后台获取
+      // queryClient.invalidateQueries([USER_INFO, userInfo.name])
+      console.log(variables, 'variables')
+
+      // 目前前端直接改
+      queryClient.setQueryData<{ background: string }>([THEME_INFO, userInfo.name], (oldTheme) =>
+        Object.assign({}, oldTheme, variables)
       )
     }
   })
@@ -97,6 +125,15 @@ const Home = () => {
           <Col span={7}>
             <Space wrap>
               <div>
+                变更背景色
+                <input
+                  type="color"
+                  onChange={(e) => {
+                    themeMutation.mutate({ background: e.target.value })
+                  }}
+                />
+              </div>
+              <div>
                 变更用户 :
                 <Input
                   placeholder="用户Id..."
@@ -111,7 +148,7 @@ const Home = () => {
                 <Button onClick={() => changeUser(toChangUserName)}>确认</Button>
               </div>
               <div>
-                变更权限 :
+                变更Dashboard权限 :
                 <Input
                   placeholder="权限Id,用','隔开"
                   value={toChangeUserDashboard}
