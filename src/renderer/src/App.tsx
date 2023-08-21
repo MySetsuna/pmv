@@ -9,6 +9,8 @@ import {
 import Home from './components/Home/Home'
 import { useAuth } from './providers'
 import Dashboard from './components/Dashboard'
+import { useTheme } from './providers/ThemeProvider'
+import './App.less'
 
 const ErrorBoundary = () => {
   const error = useRouteError() as Error
@@ -20,6 +22,7 @@ const App = () => {
 
   // 在这里使用context里的数据
   const { userInfo, isLoading } = useAuth()
+  const { background } = useTheme()
   const router = createHashRouter(
     createRoutesFromElements(
       <Route
@@ -27,7 +30,7 @@ const App = () => {
         element={<Home />}
         errorElement={
           <>
-            没有权限<NavLink to="/">返回首页</NavLink>
+            404 <NavLink to="/">返回首页</NavLink>
           </>
         }
       >
@@ -51,9 +54,9 @@ const App = () => {
     )
   )
   return (
-    <>
+    <div style={{ background, height: '100vh' }}>
       <RouterProvider router={router} />
-    </>
+    </div>
   )
 }
 

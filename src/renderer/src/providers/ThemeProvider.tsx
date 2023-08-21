@@ -1,4 +1,8 @@
-import { createContext, type ReactNode } from 'react'
+import { createContext, useContext, type ReactNode } from 'react'
+import { useAuth } from './AuthProvider'
+import { useQuery } from '@tanstack/react-query'
+import { THEME_INFO } from '@renderer/constant/api'
+import { getThemeByUserId } from '@renderer/api/theme'
 
 type Props = {
   children: ReactNode
@@ -9,9 +13,23 @@ type ThemeContextValue = { background: string } | undefined
 const ThemeContext = createContext<ThemeContextValue>(undefined)
 
 const ThemeProvider = (props: Props) => {
-  console.log('ThemeProvider')
+  const { userInfo } = useAuth()
+  const { data: themeData = { background: '' } } = useQuery(
+    [THEME_INFO, userInfo.name],
+    () => getThemeByUserId(userInfo.name ?? ''),
+    {
+      enabled: !!userInfo.name
+    }
+  )
 
-  return <ThemeContext.Provider value={undefined}>{props.children}</ThemeContext.Provider>
+  return <ThemeContext.Provider value={themeData}>{props.children}</ThemeContext.Provider>
+}
+function useTheme() {
+  const contextValue = useContext(ThemeContext)
+  if (!contextValue) {
+    throw new Error('请在ThemeProvider中使用useTheme')
+  }
+  return contextValue
 }
 
-export default ThemeProvider
+export { useTheme, ThemeProvider }

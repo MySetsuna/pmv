@@ -1,8 +1,10 @@
-import { UserInfo, useAuth } from '@renderer/providers'
+import { useAuth } from '@renderer/providers'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { memo, useCallback, useEffect, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import './Home.less'
+import { type UserInfo } from '@renderer/types'
+import { USER_INFO } from '@renderer/constant/api'
 
 const postUserInfo = async () => {
   return await new Promise<boolean>((resolve) => {
@@ -20,17 +22,21 @@ const Home = () => {
   )
   const queryClient = useQueryClient()
   // 修改
-  const mutation = useMutation<boolean, Error, number[]>({
+  const mutation = useMutation<boolean, Error, UserInfo>({
     mutationFn: postUserInfo,
+    // onMutate(variables) {
+    //   queryClient.setQueryData<UserInfo>([USER_INFO, userInfo.name], (preUserInfo) =>
+    //     Object.assign({}, preUserInfo, { dashboard: variables })
+    //   )
+    // },
     onSuccess: (_data, variables) => {
       // 错误处理和刷新
       // 从后台获取
-      // queryClient.invalidateQueries(['useInfo', userInfo.name])
+      // queryClient.invalidateQueries([USER_INFO, userInfo.name])
       // 前端直接改
-      queryClient.setQueryData<UserInfo>(['useInfo', userInfo.name], (preUserInfo) => {
-        console.log(preUserInfo, variables)
-        return Object.assign({}, preUserInfo, { dashboard: variables })
-      })
+      queryClient.setQueryData<UserInfo>([USER_INFO, userInfo.name], (preUserInfo) =>
+        Object.assign({}, preUserInfo, variables)
+      )
     }
   })
 
@@ -72,7 +78,7 @@ const Home = () => {
             }
           }}
         />
-        <button onClick={() => changeUser(toChangUserName ?? '')}>确认</button>
+        <button onClick={() => changeUser(toChangUserName)}>确认</button>
       </div>
       <div>
         变更权限 :
@@ -82,23 +88,25 @@ const Home = () => {
           onChange={(e) => setToChangeDashboard(e.target.value)}
           onKeyDown={(e) => {
             if (e.code === 'Enter') {
-              mutation.mutate(
-                toChangeUserDashboard
-                  .split(',')
-                  .filter((item) => item)
-                  .map(Number) ?? []
-              )
+              mutation.mutate({
+                dashboard:
+                  toChangeUserDashboard
+                    .split(',')
+                    .filter((item) => item)
+                    .map(Number) ?? []
+              })
             }
           }}
         />
         <button
           onClick={() =>
-            mutation.mutate(
-              toChangeUserDashboard
-                .split(',')
-                .filter((item) => item)
-                .map(Number) ?? []
-            )
+            mutation.mutate({
+              dashboard:
+                toChangeUserDashboard
+                  .split(',')
+                  .filter((item) => item)
+                  .map(Number) ?? []
+            })
           }
         >
           确认

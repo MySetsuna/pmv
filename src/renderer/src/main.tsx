@@ -1,10 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
-import './assets/index.css'
 import App from './App'
 import { AuthProvider } from './providers'
-import ThemeProvider from './providers/ThemeProvider'
+import { ThemeProvider } from './providers/ThemeProvider'
 
 const queryClient = new QueryClient()
 

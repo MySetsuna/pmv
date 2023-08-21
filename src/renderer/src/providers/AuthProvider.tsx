@@ -8,24 +8,9 @@ import {
   useEffect
 } from 'react'
 import { useQuery } from '@tanstack/react-query'
-
-export type UserInfo = { [props: string]: unknown; name?: string; dashboard?: number[] }
-
-const getUserInfo = async (userId: string) => {
-  console.log('fetch user Info ', userId)
-
-  return await new Promise<UserInfo>((resolve) => {
-    setTimeout(() => {
-      if (userId === 'Jack') {
-        resolve({ name: userId, dashboard: [1, 2] })
-      } else if (userId === 'John') {
-        resolve({ name: userId, dashboard: [2] })
-      } else {
-        resolve({ name: userId, dashboard: [] })
-      }
-    }, 500)
-  })
-}
+import { UserInfo } from '@renderer/types'
+import { getUserInfo } from '@renderer/api/user'
+import { USER_INFO } from '@renderer/constant/api'
 
 type Props = {
   children: ReactNode
@@ -52,13 +37,11 @@ const AuthProvider = (props: Props) => {
     setUserId('Jack')
   }, [])
 
-  console.log(getUserInfo, 'getUserInfo')
-
   const {
-    data: userInfo = {},
+    data: userInfo = { name: userId },
     isLoading,
     isError
-  } = useQuery(['useInfo', userId], () => getUserInfo(userId), {
+  } = useQuery([USER_INFO, userId], () => getUserInfo(userId), {
     enabled: !!userId
   })
 
