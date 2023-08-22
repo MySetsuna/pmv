@@ -21,8 +21,13 @@ const ThemeProvider = (props: Props) => {
       enabled: !!userInfo.name
     }
   )
+  const { background } = themeData
 
-  return <ThemeContext.Provider value={themeData}>{props.children}</ThemeContext.Provider>
+  return (
+    <ThemeContext.Provider value={themeData}>
+      <div style={{ background }}>{props.children}</div>
+    </ThemeContext.Provider>
+  )
 }
 function useTheme() {
   const contextValue = useContext(ThemeContext)

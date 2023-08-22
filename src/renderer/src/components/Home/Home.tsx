@@ -73,8 +73,7 @@ const Home = () => {
     onSuccess: (_data, variables) => {
       // 错误处理和刷新
       // 从后台获取
-      // queryClient.invalidateQueries([USER_INFO, userInfo.name])
-      console.log(variables, 'variables')
+      // queryClient.invalidateQueries([THEME_INFO, userInfo.name])
 
       // 目前前端直接改
       queryClient.setQueryData<{ background: string }>([THEME_INFO, userInfo.name], (oldTheme) =>
